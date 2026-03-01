@@ -75,20 +75,19 @@ public class TareaController {
 
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
-                            description = "Tarea eliminada correctamente",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TareaDTO.class))),
+                            responseCode = "204",
+                            description = "Tarea eliminada correctamente (sin contenido)"),
                     @ApiResponse(
                             responseCode = "404",
-                            description = "Tarea no asociada")
+                            description = "Tarea no encontrada")
             }
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Long id) {
+        // HttpStatus.NO_CONTENT (204) es el estándar REST para eliminaciones exitosas
+        // No se devuelve cuerpo en la respuesta
         tareaServices.deleteById(id);
-        return new ResponseEntity<>("Eliminado exitosamente", HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 
 

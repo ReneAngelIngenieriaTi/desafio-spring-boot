@@ -21,27 +21,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
+
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            try {
-                String username = jwtUtil.validateToken(token);
+        if (authHeader != null) {
 
-                SecurityContextHolder.getContext().setAuthentication(
-                        new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-                        )
-                );
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+            String[] parts = authHeader.split(" ");
+
+            if (parts.length == 2 && parts[0].equalsIgnoreCase("Bearer")) {
+
+                String token = parts[1];
+
+                try {
+                    String username = jwtUtil.validateToken(token);
+
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    username,
+                                    null,
+                                    Collections.singletonList(
+                                            new SimpleGrantedAuthority("ROLE_USER")
+                                    )
+                            );
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                } catch (Exception e) {
+                    SecurityContextHolder.clearContext();
+                }
             }
         }
 

@@ -5,7 +5,6 @@ info:
   termsOfService: 'https://www.NUEVO_SPA.com/terms-of-service/'
   contact:
     name: Rene Angel Silva Zuñiga
-    url: 'https://www.redessociales.com/reneangel.silva'
     email: reneangel.silva@gmail.com
   version: 0.0.1
 servers:
@@ -14,6 +13,8 @@ servers:
 security:
   - Security Token: []
 tags:
+  - name: TareaEstado
+    description: Controller para Tareas
   - name: Tareas
     description: Controller para Tareas
 paths:
@@ -91,14 +92,14 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
-          description: Tarea eliminada correctamente
+        '204':
+          description: Tarea eliminada correctamente (sin contenido)
           content:
-            application/json:
+            '*/*':
               schema:
-                $ref: '#/components/schemas/TareaDTO'
+                type: object
         '404':
-          description: Tarea no asociada
+          description: Tarea no encontrada
           content:
             '*/*':
               schema:
@@ -205,6 +206,28 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ApiResponseDTO'
+  /api/v1/tareaEstados:
+    get:
+      tags:
+        - TareaEstado
+      summary: Buscar tareaEstados
+      description: Retorna lista de tareaEstado o vacio sino no existiera ninguna
+      operationId: findAll_1
+      responses:
+        '200':
+          description: Tareas eSTADO asociadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TareaDTO'
+        '404':
+          description: ' no se encontraron Tareas Estado asociadas'
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TareaEstadoDTO'
   /api/v1/auth/onlytoken:
     get:
       tags:
@@ -256,6 +279,26 @@ components:
           type: string
         data:
           type: object
+    Tarea:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        description:
+          type: string
+    TareaEstadoDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nameState:
+          type: string
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tarea'
   securitySchemes:
     SecurityToken:
       type: http

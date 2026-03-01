@@ -37,14 +37,32 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable() )
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
+
+                        // ✅ ENDPOINTS PÚBLICOS - Autenticación
                         .requestMatchers("/api/v1/auth/**").permitAll()
+
+                        // ✅ ENDPOINTS PÚBLICOS - H2 Console
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/h2-console/login.do**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html**").permitAll()
-                        .requestMatchers("/api/v1/tareas/**").authenticated()
-                        .requestMatchers("/api/v1/states/**").authenticated()
+
+                        // ✅ ENDPOINTS PÚBLICOS - Swagger/OpenAPI
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/v3/api-docs.yaml").permitAll()
+                        .requestMatchers("/swagger-resources").permitAll()
+                        .requestMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
+
+                        // ✅ ENDPOINTS PÚBLICOS - Actuator
                         .requestMatchers("/actuator").permitAll()
-                        .anyRequest().denyAll())
+
+                        // 🛡️ ENDPOINTS PROTEGIDOS - Requieren JWT
+                        .requestMatchers("/api/v1/tareas/**").authenticated()
+                        .requestMatchers("/api/v1/tareaEstados/**").authenticated()
+
+                        .anyRequest().authenticated())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(customAuthenticationEntryPoint) // Manejo de errores 401
                         .accessDeniedHandler(customAccessDeniedHandler)) // Manejo de errores 403
